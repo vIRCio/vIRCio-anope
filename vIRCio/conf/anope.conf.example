@@ -1,0 +1,474 @@
+############################################################
+#                                                          #
+#                 Rede vIRCio - Anope 2.1                 #
+#                                                          #
+# Configuracao principal dos Services da Rede vIRCio.      #
+# Baseline: Anope 2.1.27                                   #
+#                                                          #
+############################################################
+
+
+# ==========================================================
+# IDENTIDADE DOS SERVICES
+# ==========================================================
+
+define
+{
+    name = "services.host"
+    value = "services.vircio.net"
+}
+
+
+# ==========================================================
+# UPLINK PARA O INSPIRCd
+# ==========================================================
+#
+# Deployment atual:
+#   Anope e InspIRCd no mesmo servidor.
+#   Link exclusivamente por 127.0.0.1:7008.
+#   Sem TLS porque o trafego nao sai do loopback.
+#
+# O segredo e fornecido por variavel de ambiente e nunca
+# deve ser versionado.
+#
+
+uplink
+{
+    host = "127.0.0.1"
+    protocol = "ipv4"
+    ssl = no
+    port = 7008
+
+    password = "${env.ANOPE_UPLINK_PASSWORD}"
+}
+
+
+# ==========================================================
+# SERVIDOR SERVICES
+# ==========================================================
+
+serverinfo
+{
+    name = "${services.host}"
+
+    description = "vIRCio - conectando pessoas"
+
+    # SID utilizado pelo protocolo InspIRCd/SpanningTree.
+    id = "1SV"
+
+    # Relativo ao diretorio data do Anope.
+    pid = "anope.pid"
+
+    # Relativo ao diretorio conf do Anope.
+    motd = "motd.txt"
+}
+
+
+# ==========================================================
+# PROTOCOLO IRCd
+# ==========================================================
+
+module
+{
+    name = "inspircd"
+}
+
+
+# ==========================================================
+# PARAMETROS DA REDE
+# ==========================================================
+#
+# Estes limites acompanham exatamente o InspIRCd v4 da
+# Rede vIRCio.
+#
+
+networkinfo
+{
+    networkname = "vIRCio"
+
+    nicklen = 31
+    userlen = 11
+    hostlen = 64
+    chanlen = 64
+
+    modelistsize = 128
+
+    allow_undotted_vhosts = yes
+    disallow_start_or_end = ".-/"
+}
+
+
+# ==========================================================
+# OPCOES GERAIS
+# ==========================================================
+
+options
+{
+    # Igual ao casemap utilizado pelo InspIRCd.
+    casemap = "ascii"
+
+    # Protecao contra tentativas repetidas de senha.
+    badpasslimit = 5
+    badpasstimeout = 1h
+
+    # Persistencia e verificacoes periodicas.
+    updatetimeout = 3m
+    expiretimeout = 30m
+
+    # Controle da conexao com o uplink.
+    readtimeout = 5s
+    timeoutcheck = 3s
+    retrywait = 60s
+
+    # O InspIRCd possui aliases server-side para os Services.
+    servicealias = yes
+
+    # Oculta comandos que o usuario nao pode executar.
+    hideprivilegedcommands = yes
+    hideregisteredcommands = yes
+
+    # Sugestao de comandos semelhantes.
+    didyoumeandifference = 4
+
+    # Codigos de confirmacao.
+    codelength = 15
+
+    # Largura maxima das respostas tabulares.
+    linelength = 100
+
+    # Provider fornecido pelo modulo regex_pcre2.
+    regexengine = "regex/pcre"
+
+    # Traducao oficial da vIRCio.
+    languages = "pt_BR.UTF-8"
+    defaultlanguage = "pt_BR.UTF-8"
+}
+
+
+# ==========================================================
+# SERVICES
+# ==========================================================
+#
+# Cada arquivo sera configurado individualmente na sequencia.
+#
+
+include
+{
+    type = "file"
+    name = "botserv.conf"
+}
+
+include
+{
+    type = "file"
+    name = "chanserv.conf"
+}
+
+include
+{
+    type = "file"
+    name = "global.conf"
+}
+
+include
+{
+    type = "file"
+    name = "hostserv.conf"
+}
+
+include
+{
+    type = "file"
+    name = "memoserv.conf"
+}
+
+include
+{
+    type = "file"
+    name = "nickserv.conf"
+}
+
+include
+{
+    type = "file"
+    name = "operserv.conf"
+}
+
+
+# ==========================================================
+# LOG PRINCIPAL
+# ==========================================================
+#
+# Registra eventos no arquivo services.log e no canal
+# administrativo #ServiceS.
+#
+# O pseudocliente vIRCio sera definido em global.conf.
+#
+
+log
+{
+    target = "services.log #ServiceS"
+    bot = "vIRCio"
+
+    # Retencao dos logs em dias.
+    logage = 180
+
+    admin = "*"
+
+    override = "chanserv/* nickserv/* memoserv/set ~botserv/set botserv/*"
+
+    commands = "~operserv/* *"
+
+    servers = "*"
+
+    users = "connect disconnect nick"
+
+    other = "*"
+
+    rawio = no
+    debug = no
+}
+
+
+# ==========================================================
+# LOG ADMINISTRATIVO VIA GLOBOPS
+# ==========================================================
+
+log
+{
+    bot = "vIRCio"
+    target = "globops"
+
+    admin = "global/* operserv/chankill operserv/mode operserv/kick operserv/akill operserv/s*line operserv/noop operserv/jupe operserv/set operserv/svsnick operserv/svsjoin operserv/svspart nickserv/getpass */drop"
+
+    servers = "squit"
+
+    users = "oper"
+
+    other = "expire/* bados akill/*"
+}
+
+
+# ==========================================================
+# HIERARQUIA DOS SERVICES
+# ==========================================================
+#
+# Esta hierarquia pertence exclusivamente ao Anope:
+#
+#   Services Root
+#        |
+#   Services Admin
+#        |
+#   Services Oper
+#        |
+#      Helper
+#
+# No InspIRCd os unicos OperTypes sao:
+#
+#   IRC Admin
+#   IRC Oper
+#
+
+
+# ----------------------------------------------------------
+# Helper
+# ----------------------------------------------------------
+
+opertype
+{
+    name = "Helper"
+
+    commands = "hostserv/*"
+}
+
+
+# ----------------------------------------------------------
+# Zombie Scanner
+# ----------------------------------------------------------
+#
+# Identidade de maquina independente para o ZombieGringo.
+# Nao herda Helper, Services Oper, Services Admin ou Services
+# Root; possui somente a acao semantica de quarentena via
+# ZombieServ, sem privilegios de IRCop.
+#
+
+opertype
+{
+    name = "Zombie Scanner"
+
+    commands = "operserv/zombie"
+}
+
+
+# ----------------------------------------------------------
+# Services Oper
+# ----------------------------------------------------------
+
+opertype
+{
+    name = "Services Oper"
+
+    inherits = "Helper"
+
+    commands = "chanserv/list chanserv/suspend chanserv/topic memoserv/staff nickserv/list nickserv/resend nickserv/suspend operserv/mode operserv/chankill operserv/akill operserv/session operserv/modinfo operserv/sqline operserv/oper operserv/kick operserv/ignore operserv/snline"
+
+    privs = "chanserv/auspex chanserv/no-register-limit memoserv/* nickserv/auspex nickserv/confirm/*"
+}
+
+
+# ----------------------------------------------------------
+# Services Admin
+# ----------------------------------------------------------
+
+opertype
+{
+    name = "Services Admin"
+
+    inherits = "Services Oper"
+
+    commands = "botserv/* chanserv/access/list chanserv/drop chanserv/getkey chanserv/saset/noexpire memoserv/sendall nickserv/saset/* nickserv/getemail operserv/news operserv/jupe operserv/svs operserv/stats operserv/forbid operserv/zombie global/*"
+
+    privs = "*"
+}
+
+
+# ----------------------------------------------------------
+# Services Root
+# ----------------------------------------------------------
+
+opertype
+{
+    name = "Services Root"
+
+    inherits = "Services Admin"
+
+    commands = "*"
+    privs = "*"
+}
+
+
+# ==========================================================
+# SERVICES OPERATORS
+# ==========================================================
+#
+# Services Root exige que a conta tambem seja IRC Operator
+# no InspIRCd.
+#
+# ZombieGringo deve usar uma conta dedicada e o OperType
+# "Zombie Scanner". Nao criar este oper block ate que a conta
+# e o certificado/fingerprint dedicado estejam provisionados.
+# Para o scanner, require_oper e require_login devem permanecer
+# no e nao deve haver password: SASL EXTERNAL mais certfp e a
+# autenticacao de conta substituem /OperServ LOGIN. O scanner nao
+# deve receber privilegios de IRCop; host e defesa adicional.
+#
+
+oper
+{
+    name = "cirinho"
+
+    type = "Services Root"
+
+    require_oper = yes
+}
+
+
+# ==========================================================
+# E-MAIL
+# ==========================================================
+#
+# Inicialmente desabilitado.
+#
+# Antes de ativar:
+#   - configurar relay SMTP/sendmail-compatible;
+#   - garantir que o IP dos Services nao seja exposto;
+#   - criar templates pt_BR texto e HTML.
+#
+
+mail
+{
+    usemail = no
+
+    delay = 5m
+
+    # Futuro:
+    #sendmailpath = "/usr/bin/msmtp -t"
+    #sendfrom = "vIRCio Services <services@vircio.net>"
+}
+
+
+# ==========================================================
+# BANCO DE DADOS
+# ==========================================================
+#
+# db_json sera utilizado inicialmente.
+#
+
+module
+{
+    name = "db_json"
+
+    database = "anope.json"
+
+    module_database = "{name}.module.json"
+
+    daily_backups = 7
+    monthly_backups = 3
+
+    backup_directory = "backups"
+
+    ignore_backup_failure = no
+
+    preserve_unknown_data = yes
+}
+
+
+# ==========================================================
+# CRIPTOGRAFIA
+# ==========================================================
+#
+# O primeiro modulo e o algoritmo principal para novas senhas.
+# Bcrypt cost 12 acompanha a politica utilizada no InspIRCd.
+#
+
+
+# Bcrypt - principal.
+
+module
+{
+    name = "enc_bcrypt"
+
+    rounds = 12
+}
+
+
+# SHA-2 - secundario.
+
+module
+{
+    name = "enc_sha2"
+
+    algorithm = "sha512"
+}
+
+
+# ==========================================================
+# MODULOS ADICIONAIS
+# ==========================================================
+#
+# modules.conf recebera PCRE2, JSON-RPC, HTTP e demais
+# funcionalidades adicionais.
+#
+
+include
+{
+    type = "file"
+    name = "modules.conf"
+}
+
+
+############################################################
+#                                                          #
+#                  Fim do anope.conf                       #
+#                                                          #
+############################################################

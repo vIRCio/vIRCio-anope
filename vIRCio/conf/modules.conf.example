@@ -1,0 +1,532 @@
+############################################################
+#                                                          #
+#            Rede vIRCio - Modulos Anope 2.1              #
+#                                                          #
+# Modulos transversais e integracoes adicionais.           #
+# Baseline: Anope 2.1.27                                   #
+#                                                          #
+############################################################
+
+
+# ==========================================================
+# HELP GENERICO
+# ==========================================================
+#
+# Provider do comando HELP utilizado pelos pseudoclients.
+#
+
+module
+{
+    name = "help"
+}
+
+
+# ==========================================================
+# DNS
+# ==========================================================
+#
+# Provider DNS interno do Anope.
+#
+# Nao e necessario para a configuracao atual.
+# Pode ser habilitado futuramente se outro modulo exigir.
+#
+
+#module
+#{
+#    name = "dns"
+#}
+
+
+# ==========================================================
+# DNSBL
+# ==========================================================
+#
+# Consulta listas DNSBL e pode bloquear hosts listados.
+#
+# Mantido comentado porque atualmente o InspIRCd ja executa
+# verificacoes DNSBL. Pode ser reavaliado no futuro.
+#
+# Requer o provider dns.
+#
+
+#module
+#{
+#    name = "dnsbl"
+#}
+
+
+# ==========================================================
+# HELP CHANNEL
+# ==========================================================
+#
+# O modulo oficial helpchan aplica usermode +h quando um
+# usuario recebe OP no canal configurado e possui OPME.
+#
+# Ele NAO remove automaticamente +h em deop, part ou perda
+# de acesso.
+#
+# A vIRCio controla Helpers no InspIRCd atraves de
+# m_vircio_ircops:
+#
+#   - +h; OU
+#   - @op/superior em #Ajuda, #Help ou #vIRCio.
+#
+# Por isso helpchan permanece deliberadamente desabilitado.
+#
+
+#module
+#{
+#    name = "helpchan"
+#
+#    helpchannel = "#Ajuda"
+#}
+
+
+# ==========================================================
+# HTTP LOCAL
+# ==========================================================
+#
+# Backend HTTP para JSON-RPC.
+#
+# Somente localhost. Nunca expor diretamente na Internet.
+# Acesso externo deve passar por proxy/tunnel.
+#
+
+module
+{
+    name = "httpd"
+
+    httpd
+    {
+        name = "httpd/main"
+
+        ip = "127.0.0.1"
+        port = 8080
+
+        timeout = 30
+    }
+}
+
+
+# ==========================================================
+# MYSQL / MARIADB
+# ==========================================================
+#
+# Provider SQL opcional.
+#
+# Mantido documentado e comentado para futura integracao.
+# Pode exigir habilitar/recompilar o EXTRA mysql.
+#
+# Nunca inserir credenciais reais neste arquivo versionado.
+#
+
+#module
+#{
+#    name = "mysql"
+#
+#    mysql
+#    {
+#        name = "mysql/main"
+#        database = "anope"
+#        server = "127.0.0.1"
+#        port = 3306
+#        username = "anope"
+#        password = "${env.ANOPE_MYSQL_PASSWORD}"
+#    }
+#}
+
+
+# ==========================================================
+# REGEX - PCRE2
+# ==========================================================
+#
+# Provider regex/pcre utilizado pelo Anope.
+# Mantem o mesmo engine utilizado pelo InspIRCd.
+#
+
+module
+{
+    name = "regex_pcre2"
+}
+
+
+# ==========================================================
+# REWRITE
+# ==========================================================
+#
+# Permite criar aliases/compatibilidade transformando um
+# comando dos Services em outro comando.
+#
+# Exemplo conceitual:
+#
+#   ChanServ CLEAR #canal USERS
+#       ->
+#   ChanServ KICK #canal *
+#
+# Suporta placeholders como:
+#
+#   $0
+#   $1
+#   $1-
+#   $me
+#
+# Mantido comentado. Ativar apenas se identificarmos uma
+# sintaxe legada que precise de compatibilidade.
+#
+
+#module
+#{
+#    name = "rewrite"
+#}
+
+#command
+#{
+#    service = "ChanServ"
+#    name = "CLEAR"
+#    command = "rewrite"
+#
+#    rewrite = yes
+#    rewrite_source = "CLEAR $ USERS"
+#    rewrite_target = "KICK $1 *"
+#    rewrite_description = "Clears all users from a channel"
+#}
+
+
+# ==========================================================
+# PROXYSCAN
+# ==========================================================
+#
+# Scanner de proxies HTTP/SOCKS abertos.
+#
+# Mantido comentado para avaliacao futura.
+#
+# ATENCAO:
+# pode revelar o IP dos Services porque precisa realizar
+# conexoes diretas e receber callbacks dos proxies.
+#
+# A rede tambem possui a arquitetura ZombieGringo.
+#
+
+#module
+#{
+#    name = "proxyscan"
+#
+#    target_port = 7226
+#    listen_port = 7226
+#    add_to_akill = yes
+#    timeout = 5
+#
+#    proxyscan
+#    {
+#        type = "HTTP"
+#        port = "80,8080"
+#        time = 4h
+#        reason = "Open proxy detected ({type}:{ip}:{port})"
+#    }
+#}
+
+
+# ==========================================================
+# TLS OPENSSL
+# ==========================================================
+#
+# Desnecessario para o uplink atual:
+#
+#   Anope -> 127.0.0.1:7008 -> InspIRCd
+#
+# Mantido comentado caso Services seja separado fisicamente
+# do IRCd ou passe a servir TLS diretamente.
+#
+
+#module
+#{
+#    name = "ssl_openssl"
+#}
+
+
+# ==========================================================
+# SQL AUTHENTICATION
+# ==========================================================
+
+#module
+#{
+#    name = "sql_authentication"
+#}
+
+
+# ==========================================================
+# SQL LOG
+# ==========================================================
+
+#module
+#{
+#    name = "sql_log"
+#}
+
+
+# ==========================================================
+# SQL OPER
+# ==========================================================
+
+#module
+#{
+#    name = "sql_oper"
+#}
+
+
+# ==========================================================
+# SQLITE
+# ==========================================================
+
+#module
+#{
+#    name = "sqlite"
+#}
+
+
+# ==========================================================
+# JSON-RPC
+# ==========================================================
+#
+# API oficial utilizada pelo site e automacoes vIRCio.
+#
+# Escuta via httpd/main em 127.0.0.1.
+#
+# O token plaintext fica fora do Anope.
+# Aqui o Services recebe apenas o hash Bcrypt.
+#
+
+module
+{
+    name = "jsonrpc"
+
+    # Compatibilidade com inteiros JavaScript.
+    integer_bits = 53
+
+    server = "httpd/main"
+
+    token
+    {
+        token = "${env.ANOPE_RPC_TOKEN_HASH}"
+        token_hash = "bcrypt"
+
+        # Permite API geral e system.listMethods.
+        # Bloqueia explicitamente rpc_message.
+        methods = "~anope.message* anope.* system.*"
+    }
+}
+
+
+# ==========================================================
+# RPC DATA
+# ==========================================================
+#
+# Consulta:
+#   contas
+#   canais
+#   Services opers
+#   servidores
+#   usuarios
+#
+
+module
+{
+    name = "rpc_data"
+}
+
+
+# ==========================================================
+# RPC USER
+# ==========================================================
+#
+# Credenciais e execucao de comandos pela API.
+#
+# pretenduser permanece desligado.
+#
+
+module
+{
+    name = "rpc_user"
+
+    pretenduser = no
+}
+
+
+# ==========================================================
+# RPC SYSTEM
+# ==========================================================
+#
+# Fornece system.listMethods.
+#
+
+module
+{
+    name = "rpc_system"
+}
+
+
+# ==========================================================
+# RPC MESSAGE
+# ==========================================================
+#
+# Permite envio de mensagens para:
+#   usuarios
+#   servidores
+#   rede inteira
+#
+# Deliberadamente desabilitado ate existir caso de uso.
+#
+
+#module
+#{
+#    name = "rpc_message"
+#}
+
+
+# ==========================================================
+# WEB CONTROL PANEL
+# ==========================================================
+#
+# Painel web oficial do Anope.
+#
+# Foi utilizado/avaliado historicamente e permanece disponivel,
+# mas a arquitetura atual da vIRCio usara site proprio + JSON-RPC.
+#
+# Mantido comentado para uso futuro.
+#
+
+#module
+#{
+#    name = "webcpanel"
+#
+#    server = "httpd/main"
+#    template_dir = "webcpanel/templates/default"
+#    title = "vIRCio Services"
+#}
+
+
+# ==========================================================
+# XML-RPC
+# ==========================================================
+#
+# Interface RPC legada.
+#
+# Nao pode ser carregada junto com jsonrpc.
+# Mantida apenas como referencia de compatibilidade.
+#
+
+#module
+#{
+#    name = "xmlrpc"
+#
+#    server = "httpd/main"
+#}
+
+
+# ==========================================================
+# vIRCio STAFF SWHOIS
+# ==========================================================
+#
+# O InspIRCd usa m_swhois_ext e o protocolo InspIRCd do
+# Anope 2.1.27 detecta esse modulo automaticamente.
+#
+# O Anope suporta SWHOIS multiplo via specialwhois. O modulo
+# usa a tag exclusiva vircio-services-staff e publica no WHOIS:
+#
+#   Services Root
+#   Services Admin
+#   Services Oper
+#
+# conforme o OperType real e valido da conta.
+# Helper nao recebe SWHOIS deste modulo.
+#
+
+module
+{
+    name = "vircio_staffwhois"
+}
+
+
+# ==========================================================
+# vIRCio DEFAULT TIMEZONE
+# ==========================================================
+#
+# O ns_set_timezone oficial usa UTC quando a conta ainda nao
+# escolheu timezone.
+#
+# A politica vIRCio e:
+#
+#   America/Sao_Paulo
+#
+# correspondente ao horario de Brasilia (UTC-3 atualmente).
+#
+# O modulo vircio_defaulttimezone reutiliza o extensible
+# serializavel "timezone" de ns_set_timezone; nao cria formato
+# de dados proprio. Ele preenche somente contas sem escolha
+# explicita, inclusive contas carregadas no startup, e trata o
+# reset sem argumento como America/Sao_Paulo imediatamente.
+#
+
+module
+{
+    name = "vircio_defaulttimezone"
+}
+
+
+# ==========================================================
+# vIRCio ZOMBIE / GRINGO
+# ==========================================================
+#
+# Disponibiliza somente a acao autorizada ZOMBIE ADD|DEL. O
+# ZombieServ e a frente de menor privilegio para ZombieGringo:
+# ele evita o bloqueio opersonly do OperServ sem transformar o
+# scanner em IRCop. Services Admin e Services Root mantem o
+# comando OperServ para administracao humana.
+#
+# O InspIRCd m_vircio_zombie impoe +Z, #vIRCio e a liberacao
+# automatica apos autenticacao. Este modulo nao faz scanning,
+# GeoIP, DNSBL ou politica de IP.
+#
+
+module
+{
+    name = "vircio_zombie"
+}
+
+service
+{
+    nick = "ZombieServ"
+    user = "zombieserv"
+    host = "services.vircio.net"
+    real = "vIRCio Zombie quarantine service"
+}
+
+command
+{
+    service = "ZombieServ"
+    name = "HELP"
+    command = "generic/help"
+}
+
+command
+{
+    service = "ZombieServ"
+    name = "ZOMBIE"
+    command = "operserv/zombie"
+    permission = "operserv/zombie"
+}
+
+command
+{
+    service = "OperServ"
+    name = "ZOMBIE"
+    command = "operserv/zombie"
+    permission = "operserv/zombie"
+}
+
+
+############################################################
+#                                                          #
+#                 Fim do modules.conf                      #
+#                                                          #
+############################################################
