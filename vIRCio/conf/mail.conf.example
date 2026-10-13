@@ -1,0 +1,88 @@
+# vIRCio Services: transporte nativo sendmail-compatible do Postfix local.
+# Preparado, NAO habilitado/homologado: faltam ajuste administrativo do MTA,
+# SPF unico, DKIM/DMARC e caixas tecnicas para comprovar recebimento.
+# Entrega direta expoe o IP do MTA nos cabecalhos; nao promete ocultacao.
+# Exit status zero do sendmail significa aceite na fila, nao recebimento.
+mail
+{
+    usemail = no
+    sendmailpath = "/usr/sbin/sendmail -i -t -f services@vircio.net"
+    sendfrom = "vIRCio Services <services@vircio.net>"
+    delay = 5m
+
+    # PT-BR e o fallback desta preparacao; o idioma nativo atual e pt_BR.UTF-8.
+    # Os templates/catalogos upstream existentes permanecem intactos.
+    registration
+    {
+        subject = "vIRCio - Confirme o cadastro de {nick}"
+        subject[pt_BR.UTF-8] = "vIRCio - Confirme o cadastro de {nick}"
+        message
+        {
+            content_type = "text/plain; charset=UTF-8"
+            file = "email/pt_BR/registration.txt"
+            file[pt_BR.UTF-8] = "email/pt_BR/registration.txt"
+        }
+        message
+        {
+            content_type = "text/html; charset=UTF-8"
+            file = "email/pt_BR/registration.html"
+            file[pt_BR.UTF-8] = "email/pt_BR/registration.html"
+        }
+    }
+
+    password_reset
+    {
+        subject = "vIRCio - Recupere o acesso de {nick}"
+        subject[pt_BR.UTF-8] = "vIRCio - Recupere o acesso de {nick}"
+        message
+        {
+            content_type = "text/plain; charset=UTF-8"
+            file = "email/pt_BR/password_reset.txt"
+            file[pt_BR.UTF-8] = "email/pt_BR/password_reset.txt"
+        }
+        message
+        {
+            content_type = "text/html; charset=UTF-8"
+            file = "email/pt_BR/password_reset.html"
+            file[pt_BR.UTF-8] = "email/pt_BR/password_reset.html"
+        }
+    }
+
+    email_change
+    {
+        subject = "vIRCio - Confirme o novo email de {account}"
+        subject[pt_BR.UTF-8] = "vIRCio - Confirme o novo email de {account}"
+        message
+        {
+            content_type = "text/plain; charset=UTF-8"
+            file = "email/pt_BR/email_change.txt"
+            file[pt_BR.UTF-8] = "email/pt_BR/email_change.txt"
+        }
+        message
+        {
+            content_type = "text/html; charset=UTF-8"
+            file = "email/pt_BR/email_change.html"
+            file[pt_BR.UTF-8] = "email/pt_BR/email_change.html"
+        }
+    }
+
+    # Memoserv carrega este template com usemail=yes. Isso nao ativa
+    # notificacao por email nem altera preferencias das contas existentes.
+    memo
+    {
+        subject = "vIRCio - Novo recado para {receiver}"
+        subject[pt_BR.UTF-8] = "vIRCio - Novo recado para {receiver}"
+        message
+        {
+            content_type = "text/plain; charset=UTF-8"
+            file = "email/pt_BR/memo.txt"
+            file[pt_BR.UTF-8] = "email/pt_BR/memo.txt"
+        }
+        message
+        {
+            content_type = "text/html; charset=UTF-8"
+            file = "email/pt_BR/memo.html"
+            file[pt_BR.UTF-8] = "email/pt_BR/memo.html"
+        }
+    }
+}

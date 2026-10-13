@@ -1,0 +1,14 @@
+Olá,
+
+Foi solicitada a mudança do email da conta {account} na {network}.
+Este é o novo endereço indicado: {new_email}.
+Para confirmar a mudança pelo IRC, já autenticado na conta, use:
+
+/msg NickServ CONFIRM EMAIL {code}
+
+O pedido expira em {expiry} se não for confirmado.
+O novo endereço só se torna o email da conta após a confirmação válida.
+Não compartilhe este código. A vIRCio não pede sua senha por email.
+Se você não solicitou a mudança, ignore esta mensagem: não confirme.
+
+{network} - Conectando pessoas

@@ -392,7 +392,12 @@ module
 	 * If set to 0 or left commented there will be no limit enforced when
 	 * registering new accounts or using /msg NickServ SET EMAIL.
 	 */
-	maxemails = 3
+	/*
+	 * Site: one account per email in the paths covered by this native limit.
+	 * Existing accounts are not migrated. Operator/RPC paths and concurrent
+	 * confirmations still require verification before enabling email login.
+	 */
+	maxemails = 1
 
 	/*
 	 * Whether to attempt to remove aliases when counting email addresses. This
@@ -595,7 +600,8 @@ command { service = "NickServ"; name = "RESEND"; command = "nickserv/resend" }
  *
  * Provides the command nickserv/confirm/resetpass and nickserv/resetpass.
  *
- * Used for resetting passwords by emailing users a temporary one.
+ * Sends a confirmation code. CONFIRM RESETPASS identifies the user;
+ * SET PASSWORD is then required to choose a new password.
  */
 module
 {

@@ -1,0 +1,11 @@
+Olá,
+
+A conta {receiver} na {network} recebeu um novo recado de {sender}.
+Recado número {number}:
+
+{text}
+
+Esta mensagem só é usada quando a notificação por email estiver habilitada.
+A vIRCio não pede sua senha por email.
+
+{network} - Conectando pessoas

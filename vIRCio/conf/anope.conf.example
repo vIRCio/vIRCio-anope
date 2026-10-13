@@ -377,23 +377,15 @@ oper
 # E-MAIL
 # ==========================================================
 #
-# Inicialmente desabilitado.
-#
-# Antes de ativar:
-#   - configurar relay SMTP/sendmail-compatible;
-#   - garantir que o IP dos Services nao seja exposto;
-#   - criar templates pt_BR texto e HTML.
+# Transporte e templates preparados em mail.conf, ainda desabilitados.
+# Ativacao depende do MTA, DNS e testes de recebimento documentados.
+# Entrega direta nao oculta o IP do MTA nos cabecalhos.
 #
 
-mail
+include
 {
-    usemail = no
-
-    delay = 5m
-
-    # Futuro:
-    #sendmailpath = "/usr/bin/msmtp -t"
-    #sendfrom = "vIRCio Services <services@vircio.net>"
+    type = "file"
+    name = "mail.conf"
 }
 
 

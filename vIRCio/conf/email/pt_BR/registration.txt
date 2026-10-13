@@ -1,0 +1,12 @@
+Olá,
+
+Foi solicitado o cadastro do nome de usuário {nick} na {network}.
+Para confirmar pelo IRC, use:
+
+/msg NickServ CONFIRM REGISTER {code}
+
+O cadastro pendente expira em {expiry} se não for confirmado.
+Não compartilhe este código. A vIRCio não pede sua senha por email.
+Se você não solicitou o cadastro, ignore esta mensagem: não confirme.
+
+{network} - Conectando pessoas
